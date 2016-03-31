@@ -20,6 +20,7 @@ if(($dist <= 0) or ($fuel <= 0)){
   exit;
 }
 
+
 $fuelcost = $dist / $fuel;
 
 $totaldist = $dist + $data['dist'];
