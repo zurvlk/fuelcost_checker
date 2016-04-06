@@ -16,25 +16,32 @@ $recordSet = mysql_query("SELECT * FROM fuelcost_save WHERE id = $userid");
 $data = mysql_fetch_assoc($recordSet);
 
 if(($dist <= 0) or ($fuel <= 0)){
-  msg("入力された値が不正です");
+  errmsg("入力された値が不正です");
   exit;
 }
 
 
-$fuelcost = $dist / $fuel;
+if($dist <= $data['dist']){
+  $totaldist = $dist + $data['dist'];
+  $mode = "TRIP";
+}else{
+  $totaldist = $dist;
+  $dist = $dist - $data['dist'];
+  $mode = "ODO";
+}
 
-$totaldist = $dist + $data['dist'];
+$fuelcost = $dist / $fuel;
 $totalfuel = $fuel + $data['fuel'];
 $totalfuelcost = $totaldist / $totalfuel;
 
-$body = sprintf("[給油記録]：%.1fkm走行し、%.1fL給油しました。燃費%.2fkm/L (前回比:%+.2fkm/L)\n[総走行距離:%.1fkm 累計燃費:%.2fkm/L]\n",
+$body = sprintf("[給油記録]：%.1fkm走行し、%.1fL給油しました。燃費%.2fkm/L (前回比:%+.2fkm/L)\n[総走行距離:%.1fkm 累計燃費:%.2fkm/L]\n[System：%sモードで記録しました。]\n",
                 $dist,
                 $fuel,
                 $fuelcost,
                 $fuelcost - $data['fuelcost_last'],
                 $totaldist + $data['dist_add'],
-                $totalfuelcost
-
+                $totalfuelcost,
+                $mode
                );
 
 $SQL = sprintf("UPDATE fuelcost_save SET dist = $totaldist,
@@ -49,6 +56,6 @@ mysql_query($SQL);
 
 exit;
 
-function msg($text){
+function errmsg($text){
   echo "[Error]{$text}",PHP_EOL;
 }
