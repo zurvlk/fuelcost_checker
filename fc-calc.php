@@ -7,7 +7,7 @@ if ($mysqli->connect_error) {
     echo $mysqli->connect_error;
     exit();
 } else {
-    $mysqli->set_charset("utf8");
+    $mysqli->set_charset("utf-8");
 }
 
 $userid = 1;
@@ -19,8 +19,8 @@ if(($dist <= 0) or ($fuel <= 0)){
   exit;
 }
 
-$recordSet = mysqli_query("SELECT * FROM fuelcost_save WHERE id = $userid");
-$data = mysqli_fetch_assoc($recordSet);
+$recordSet = $mysqli->query("SELECT * FROM fuelcost_save WHERE id = $userid");
+$data = mysqli_use_result($mysqli);
 
 
   if($dist <= $data['dist_total']){
@@ -48,15 +48,15 @@ $data = mysqli_fetch_assoc($recordSet);
                   $mode
                  );
 
-  $SQL = sprintf("UPDATE fuelcost_save SET dist = $totaldist,
-                                           fuel = $totalfuel,
+  $SQL = sprintf("UPDATE fuelcost_save SET dist_total = $totaldist,
+                                           fuel_total = $totalfuel,
                                            fuelcost_total= $fuelcost_total,
                                            fuelcost_last = $fuelcost,
                                            WHERE id = $userid"
                 );
 
   echo $body;
-  mysqli_query($SQL);
+  mysqli_query($mysqli,$SQL);
 
 
   return $body;
