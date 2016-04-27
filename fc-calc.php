@@ -42,10 +42,10 @@ $body = sprintf("[給油記録]：%.1fkm走行し、%.1fL給油しました。�
                   $fuel,
                   $fuelcost,
                   $fuelcost - $data['fuelcost_last'],
-                  $dist,
                   $dist_total + $data['dist_add'],
+                  $dist,
                   $fuelcost_total,
-                  $data['fuelcost_total']-$fuelcost_total,
+                  $fuelcost_total-$data['fuelcost_total'],
                   $mode
                  );
 
