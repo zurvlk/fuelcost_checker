@@ -10,14 +10,14 @@ require 'twitteroauth/autoload.php';
 require __DIR__ . '/twitteroauth/src/TwitterOAuth.php';
 
 //個人設定ファイル読み込み
-include 'conf.php';
+include 'config.php';
 
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 //オブジェクト生成
 $toa = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
 //ユーザー指定　TL取得
-$user = 'username';
+$user = TWITTER_USERNAME;
 
 $timeline = $toa->get('statuses/user_timeline', array('screen_name' => $user));
 
@@ -29,7 +29,7 @@ foreach ($timeline as $i => $tweet) {
       $arg = explode(" ",$fcc);
 
       //SQL接続関連
-      $mysqli = new mysqli('localhost', 'root', 'root', 'fc_calc');
+      $mysqli = new mysqli(SERVER_ADDRESS, SERVER_USER, SERVER_PASS, SERVER_DATABASE);
       if ($mysqli->connect_error) {
           echo $mysqli->connect_error;
           exit();
@@ -37,11 +37,8 @@ foreach ($timeline as $i => $tweet) {
           $mysqli->set_charset("utf-8");
       }
 
-      $uid = 1;
       $dist = $arg[1];
       $fuel = $arg[2];
-
-
 
       if(($dist <= 0) or ($fuel <= 0)){
         $req = $toa -> post("statuses/update", array("status"=> "[fcc.Error]入力された値が不正です" ));
@@ -50,7 +47,7 @@ foreach ($timeline as $i => $tweet) {
 
 
       //SQL実行
-      $sql = "SELECT * FROM fuelcost_save WHERE userid = $uid";
+      $sql = "SELECT * FROM fuelcost_save WHERE username LIKE '$user'";
       $result = $mysqli->query($sql);
       $data = $result->fetch_assoc();
 
@@ -93,12 +90,12 @@ foreach ($timeline as $i => $tweet) {
                                                  fuel_last = $fuel,
                                                  fuelcost_total= $fuelcost_total,
                                                  fuelcost_last = $fuelcost
-                                                 WHERE userid = $uid"
+                                                 WHERE username LIKE '$user'"
                       );
 
       $mysqli->query($SQL);
       $mysqli->close();
-      echo $body . PHP_EOL;
+      echo $body;
 
       $req = $toa -> post("statuses/update", array("status"=> $body ));
       exit;
